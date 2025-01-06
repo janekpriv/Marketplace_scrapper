@@ -21,13 +21,12 @@ def main():
     iphone13 = FacebookSearcher()
 
     iphone11_list = iphone11.getPhonesinfo()   
-    df = createTable(iphone11_list, "iphone_11_list.csv")
-    visualizeTableBar(df,"iphone11")
-    visualizeTableBubles(df,"iphone_11")
+    df_olx = createTable(iphone11_list, "iphone_11_list.csv")
+    visualizeTableBar(df_olx,"iphone11")
+    visualizeTableBubles(df_olx,"iphone_11")
 
     iphone13_list = iphone13.getProductsInfo()
-
-
+    iphone13.printInfo(iphone13_list)
 
 
 
