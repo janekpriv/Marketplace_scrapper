@@ -7,6 +7,7 @@ from visuailzations import *
 from table import *
 
 from olx_search import olxSearcher
+from facebook import FacebookSearcher
 
 def main():
     #Iphone 11 scrape:
@@ -17,11 +18,14 @@ def main():
         MINPRICE=200, #this helps filter all accesories
         PHONE_NAME="iphone 11" # this is case insesitive
     )
+    iphone13 = FacebookSearcher()
 
     iphone11_list = iphone11.getPhonesinfo()   
     df = createTable(iphone11_list, "iphone_11_list.csv")
     visualizeTableBar(df,"iphone11")
     visualizeTableBubles(df,"iphone_11")
+
+    iphone13_list = iphone13.getProductsInfo()
 
 
 
