@@ -99,15 +99,26 @@ class FacebookSearcher:
                     item_name = img_tag["alt"]
 
                 product ={
-                    "item_name" : item_name,
-                    "item_price" : item_price,
-                    "item_link" : item_link
+                    "title" : item_name,
+                    "price" : item_price,
+                    "link" : item_link
                 }
 
-                print(f"Nazwa: {item_name}")
-                print(f"Cena: {item_price}")
-                print(f"Link: {item_link}")
-                print("-" * 30)
+                #print(product)
+
+                # print(f"Nazwa: {item_name}")
+                # print(f"Cena: {item_price}")
+                # print(f"Link: {item_link}")
+                # print("-" * 30)
 
                 product_info.append(product)
 
+        return product_info
+    
+    def printInfo(self, product_list):
+        for product in product_list:
+
+            print(f"Nazwa: {product['title']}")
+            print(f"Cena: {product['price']}")
+            print(f"Link: {product['link']}")
+            print("-" * 30)
