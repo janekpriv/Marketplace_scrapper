@@ -77,8 +77,9 @@ class FacebookSearcher:
         self.browser.close()
 
         return html
-    def getProductsInfo(self, html):
+    def getProductsInfo(self):
 
+        html = self.getHTML()
         product_info = []
 
         soup = BeautifulSoup(html, "html.parser")
@@ -90,7 +91,7 @@ class FacebookSearcher:
 
             parent_a = price.find_parent("a")  
             if parent_a:
-                item_link = f"https://www.facebook.com{parent_a["href"]}"
+                item_link = f"https://www.facebook.com{parent_a['href']}"
 
 
                 img_tag = parent_a.find("img", alt=True)
@@ -107,4 +108,6 @@ class FacebookSearcher:
                 print(f"Cena: {item_price}")
                 print(f"Link: {item_link}")
                 print("-" * 30)
+
+                product_info.append(product)
 
