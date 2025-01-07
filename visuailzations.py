@@ -1,10 +1,16 @@
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import seaborn as sns
+import os
+import pandas as pd
 
 
+def visualizeTableBubles(filename, phone_name):
 
-def visualizeTableBubles(df, phone_name):
+    path = os.path.join("phones_csv", filename)
+
+    df = pd.read_csv(path)
+
     price = df['price']
     index = price.index
     sizes = (df['price'] / df['price'].max()) * 300  
