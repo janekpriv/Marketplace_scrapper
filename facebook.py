@@ -11,10 +11,13 @@ import os
 
 
 class FacebookSearcher:
-    def __init__(self):
+    def __init__(self, product="iphone", city="warsaw", days_since_listed = 1):
         #TODO:
         #add so that user can input what they are trying to search
-        self.URL ="https://www.facebook.com/marketplace/warsaw/search?daysSinceListed=1&sortBy=creation_time_descend&query=iphone%2013&exact=false&locale=pl_PL"
+        self.city = city
+        self.product = re.sub("[ ]","%20").strip()
+        self.days_since_listed = days_since_listed
+        self.URL =f"https://www.facebook.com/marketplace/{self.city}/search?daysSinceListed=1&sortBy=creation_time_descend&query={self.product}&exact=false&locale=pl_PL"
 
         #configure chomedriver
 
