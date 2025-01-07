@@ -11,11 +11,11 @@ import os
 
 
 class FacebookSearcher:
-    def __init__(self, product="iphone", city="warsaw", days_since_listed = 1):
+    def __init__(self, product="iphone%2013", city="warsaw", days_since_listed = 1):
         #TODO:
         #add so that user can input what they are trying to search
         self.city = city
-        self.product = re.sub("[ ]","%20").strip()
+        self.product = re.sub("[ ]","%20", product).strip()
         self.days_since_listed = days_since_listed
         self.URL =f"https://www.facebook.com/marketplace/{self.city}/search?daysSinceListed=1&sortBy=creation_time_descend&query={self.product}&exact=false&locale=pl_PL"
 
@@ -59,22 +59,24 @@ class FacebookSearcher:
         #TODO:
         #Fix scrolling if necesary
 
-        try:
-            start_height = self.browser.execute_script("return document.body.scrollHeight")
-            while True:
-                self.browser.execute("window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(5)
+        # try:
+        #     start_height = self.browser.execute_script("return document.body.scrollHeight")
+        #     while True:
+        #         self.browser.execute("window.scrollTo(0, document.body.scrollHeight);")
+        #         time.sleep(5)
 
-                new_height = self.browser.execute_script("return document.body.scrollHeight")
+        #         new_height = self.browser.execute_script("return document.body.scrollHeight")
 
-                if new_height ==start_height:
-                    break
+        #         if new_height ==start_height:
+        #             break
 
-                start_height = new_height
-                print('scrolled')
-        except:
-            print("error while scroling")
-            time.sleep(10)
+        #         start_height = new_height
+        #         print('scrolled')
+        # except:
+        #     print("error while scroling")
+        #     time.sleep(10)
+
+        time.sleep(20)
 
         html = self.browser.page_source
         self.browser.close()
