@@ -22,12 +22,14 @@ def main():
 
     iphone11_list = iphone11.getPhonesinfo()   
     df_olx = createTable(iphone11_list, "iphone_11_list.csv")
-    visualizeTableBar(df_olx,"iphone11")
-    visualizeTableBubles(df_olx,"iphone_11")
+    #visualizeTableBar(df_olx,"iphone11")
+    #visualizeTableBubles(df_olx,"iphone_11")
 
-    iphone13_list = iphone13.getProductsInfo()
-    iphone13.printInfo(iphone13_list)
-
+    # iphone13_list = iphone13.getProductsInfo()
+    # print(iphone13_list)
+    # df_fb = createTable(iphone13_list, "iphone_13_list_fb.csv")
+    visualizeTableBubles("iphone_13_list_fb.csv", "iphone13")
+    
 
 
 
