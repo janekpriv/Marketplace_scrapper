@@ -11,14 +11,14 @@ import os
 
 
 class FacebookSearcher:
-    def __init__(self, product="iphone%2013", city="warsaw", days_since_listed = 1):
+    def __init__(self, minprice=200, product="iphone%2013", city="warsaw", days_since_listed = 1):
         #TODO:
         #add so that user can input what they are trying to search
         self.city = city
         self.product = re.sub("[ ]","%20", product).strip()
         self.days_since_listed = days_since_listed
         self.URL =f"https://www.facebook.com/marketplace/{self.city}/search?daysSinceListed=1&sortBy=creation_time_descend&query={self.product}&exact=false&locale=pl_PL"
-
+        self.minprice = minprice
         #configure chomedriver
 
         chrome_install = ChromeDriverManager().install()
@@ -26,7 +26,7 @@ class FacebookSearcher:
         folder = os.path.dirname(chrome_install)
         chromedriver_path = os.path.join(folder, "chromedriver.exe")
         chrome_options = Options()
-        chrome_options.add_argument("--force-device-scale-factor=0.25")
+        #chrome_options.add_argument("--force-device-scale-factor=0.25")
 
         self.browser = webdriver.Chrome(
             service=Service(chromedriver_path),
@@ -59,24 +59,30 @@ class FacebookSearcher:
         #TODO:
         #Fix scrolling if necesary
 
-        # try:
-        #     start_height = self.browser.execute_script("return document.body.scrollHeight")
-        #     while True:
-        #         self.browser.execute("window.scrollTo(0, document.body.scrollHeight);")
-        #         time.sleep(5)
+        try:
+            start_height = self.browser.execute_script("return document.body.scrollHeight")
+            while True:
+                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        
+                time.sleep(5)
 
-        #         new_height = self.browser.execute_script("return document.body.scrollHeight")
+                new_height = self.browser.execute_script("return document.body.scrollHeight")
 
-        #         if new_height ==start_height:
-        #             break
+                if new_height ==start_height:
+                    break
 
-        #         start_height = new_height
-        #         print('scrolled')
-        # except:
-        #     print("error while scroling")
-        #     time.sleep(10)
+                start_height = new_height
+                print('scrolled')
+        except:
+            print("error while scroling")
+            time.sleep(1)
 
-        time.sleep(20)
+        self.browser.execute_script("document.body.style.zoom='75%'")
+        time.sleep(1)
+        self.browser.execute_script("document.body.style.zoom='50%'")
+        time.sleep(2)
+        self.browser.execute_script("document.body.style.zoom='25%'")
+        time.sleep(3)
 
         html = self.browser.page_source
         self.browser.close()
@@ -92,7 +98,10 @@ class FacebookSearcher:
 
         for price in prices:
 
-            item_price = price.strip()
+            item_price = re.sub("[zł ]","",price).strip()
+
+            if float(item_price)<=self.minprice:
+                continue
 
             parent_a = price.find_parent("a")  
             if parent_a:
@@ -102,6 +111,9 @@ class FacebookSearcher:
                 img_tag = parent_a.find("img", alt=True)
                 if img_tag:
                     item_name = img_tag["alt"]
+
+                if self.product.lower() not in item_name.lower():
+                    continue
 
                 product ={
                     "title" : item_name,
