@@ -3,11 +3,13 @@ import matplotlib.cm as cm
 import seaborn as sns
 import os
 import pandas as pd
-
+import re 
 
 def visualizeTableBubles(filename, phone_name):
 
     path = os.path.join("phones_csv", filename)
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
 
     df = pd.read_csv(path)
 
@@ -34,15 +36,30 @@ def visualizeTableBubles(filename, phone_name):
     plt.colorbar(scatter, label='Cena')
     plt.grid(color='white', linestyle='--', linewidth=0.5)
     plt.gca().set_facecolor('#d3d3d3')  # Tło wykresu
-    plt.show()
+    #plt.show()
+    
+    folder_name = str(re.match(r"^(.*?)_", phone_name).group(0))  
 
+    figName =f"{phone_name}_buble_figure.png"
+    savepath = os.path.join("visualizations",folder_name,figName)
+
+    os.makedirs(os.path.dirname(savepath), exist_ok=True)
+
+    plt.savefig(savepath)
+
+    plt.close()
 
     
-def visualizeTableBar(df, phone_name):
+def visualizeTableBar(filename, phone_name):
 
     #df=df.tail(25)
+    path = os.path.join("phones_csv", filename)
 
-    title = df['title']
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    df = pd.read_csv(path)
+
+    
     price = df['price']
 
     norm = plt.Normalize(df['price'].min(), df['price'].max())  # Min = 100, Max = 1000
@@ -54,6 +71,134 @@ def visualizeTableBar(df, phone_name):
     plt.ylabel('Cena [zł]')
     plt.title(f'Ceny {phone_name}')
     plt.colorbar(cm.ScalarMappable(norm=norm, cmap='plasma'), label='Cena')
-    plt.show()
-    
+    #plt.show()
 
+    folder_name = str(re.match(r"^(.*?)_", phone_name).group(0))  
+
+    figName =f"{phone_name}_bar_figure.png"
+    savepath = os.path.join("visualizations",folder_name,figName)
+
+    os.makedirs(os.path.dirname(savepath), exist_ok=True)
+
+    plt.savefig(savepath)
+    plt.close()
+    
+def visualizeBoxPlot(filename, phone_name):
+
+    path = os.path.join("phones_csv", filename)
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    data = pd.read_csv(path)
+
+    
+    data['price'] = pd.to_numeric(data['price'], errors='coerce')
+    data = data.dropna(subset=['price'])
+
+
+    plt.figure(figsize=(8, 6))
+    sns.boxplot(x=data['price'], color="orange")
+
+
+    plt.title(f"Boxplot cen {phone_name}", fontsize=16)
+    plt.xlabel("Cena (zł)", fontsize=12)
+
+
+    plt.tight_layout()
+    #plt.show()
+    folder_name = str(re.match(r"^(.*?)_", phone_name).group(0))  
+    figName =f"{phone_name}_box_plot_figure.png"
+    savepath = os.path.join("visualizations",folder_name,figName)
+
+    os.makedirs(os.path.dirname(savepath), exist_ok=True)
+
+    plt.savefig(savepath)
+    plt.close()
+
+def visualizeTime(filename,phone_name):
+    
+    path = os.path.join("phones_csv", filename)
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    data = pd.read_csv(path)
+
+    # Upewnienie się, że dane są w odpowiednim formacie
+    data['scrape_date'] = pd.to_datetime(data['scrape_date'])  # Konwersja na typ daty
+    data['price'] = pd.to_numeric(data['price'], errors='coerce')  # Konwersja cen na liczby
+    data = data.dropna(subset=['price'])  # Usunięcie wierszy bez ceny
+
+    # Obliczanie średniej ceny w zależności od daty
+    avg_price_by_date = data.groupby('scrape_date')['price'].mean().reset_index()
+
+    # Tworzenie wykresu
+    plt.figure(figsize=(10, 6))
+    sns.lineplot(data=avg_price_by_date, x='scrape_date', y='price', marker='o', color='blue')
+
+    # Dodanie tytułu i etykiet
+    plt.title(f"Średnia cena {phone_name} w zależności od daty", fontsize=16)
+    plt.xlabel("Data zbierania danych", fontsize=12)
+    plt.ylabel("Średnia cena (zł)", fontsize=12)
+    plt.xticks(
+        avg_price_by_date['scrape_date'],
+        rotation=45,  
+        fontsize=10 
+    ) 
+    plt.grid(True)
+
+    # Wyświetlenie wykresu
+    plt.tight_layout()
+    #plt.show()
+
+    folder_name = str(re.match(r"^(.*?)_", phone_name).group(0))  
+    figName =f"{phone_name}_over_time_figure.png"
+    savepath = os.path.join("visualizations",folder_name,figName)
+
+    os.makedirs(os.path.dirname(savepath), exist_ok=True)
+
+    plt.savefig(savepath)
+    plt.close()
+
+def visualizeHistPlot(filename, phone_name):
+
+    path = os.path.join("phones_csv", filename)
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    
+    data = pd.read_csv(path)
+
+
+    data['price'] = pd.to_numeric(data['price'], errors='coerce')  
+    data = data.dropna(subset=['price']) 
+
+
+    plt.figure(figsize=(10, 6))
+    sns.histplot(data['price'], bins=20, kde=True, color='blue')
+
+
+    plt.title(f"Rozkład cen {phone_name}", fontsize=16)
+    plt.xlabel("Cena (zł)", fontsize=12)
+    plt.ylabel("Liczba ofert", fontsize=12)
+
+
+    plt.tight_layout()
+
+    #plt.show()
+    folder_name = str(re.match(r"^(.*?)_", phone_name).group(0))    
+    figName =f"{phone_name}_Hist_Plot_figure.png"
+    savepath = os.path.join("visualizations",folder_name,figName)
+
+    os.makedirs(os.path.dirname(savepath), exist_ok=True)
+
+    plt.savefig(savepath)
+
+    plt.close()
+
+
+
+def visualizeALL(filename, phone_name):
+    visualizeTableBar(filename, phone_name)
+    visualizeTableBubles(filename, phone_name)
+    visualizeBoxPlot(filename, phone_name)
+    visualizeTime(filename, phone_name)
+    visualizeHistPlot(filename, phone_name)
