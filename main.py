@@ -33,23 +33,7 @@ def main():
         FbSearch()
         OlxSearch()
 
-    
-
-
-    
-
-   
-   
-
-
-
-    
-
-
-
-
-
-    
+ 
 
 def OlxSearch():
     iphone11OLX = olxSearcher(
