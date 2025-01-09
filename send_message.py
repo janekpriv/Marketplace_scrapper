@@ -6,6 +6,8 @@ def sendMsg(dataframe_list):
 
 
 
+
+
     filename_list=[
         "iphone_11_list_OLX.csv",
         "iphone_11_list_fb.csv",
@@ -25,10 +27,28 @@ def sendMsg(dataframe_list):
         "authorization": "NDg5MTE4ODEzMTIwMzY0NTU1.GZH0bz.MLCOquvpF-503oTyPPbxo8EJfwvxJZ4Bc_p3hk"
     }
 
-    for filename in filename_list:
+    # for filename in filename_list:
+    #     message =""
+    #     path = os.path.join("phones_csv", filename)
+    #     df=pd.read_csv(path)
+    #     sorted_pd = df.sort_values(by='price')
+    #     sorted_pd = sorted_pd.reset_index(drop=True)
+    #     cheapest = sorted_pd.head(3)
+
+    #     for i, price in cheapest.iterrows():
+
+    #         message +=f"{i}. {price['title']} \n   {price['price']} \n   {price['link']} \n \n" 
+        
+    #     message+=f"from file: {filename}"
+    #     payload ={
+    #         "content": message
+    #     }
+    #     response = requests.post(SERVER_API, payload, headers=headers)
+    
+
+    for df in dataframe_list:
         message =""
-        path = os.path.join("phones_csv", filename)
-        df=pd.read_csv(path)
+
         sorted_pd = df.sort_values(by='price')
         sorted_pd = sorted_pd.reset_index(drop=True)
         cheapest = sorted_pd.head(3)
@@ -37,7 +57,7 @@ def sendMsg(dataframe_list):
 
             message +=f"{i}. {price['title']} \n   {price['price']} \n   {price['link']} \n \n" 
         
-        message+=f"from file: {filename}"
+        message+=f"from dataframe: {df}"
         payload ={
             "content": message
         }
