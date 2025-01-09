@@ -5,11 +5,16 @@ import matplotlib.cm as cm
 import seaborn as sns
 from visuailzations import *
 from table import *
+from send_message import *
 
 from olx_search import olxSearcher
 from facebook import FacebookSearcher
 
 def main():
+
+    dataframe_list = []
+
+
     #Iphone 11 scrape:
     print("Choose mode:")
     print("1- visualization only")
@@ -21,21 +26,24 @@ def main():
     if inpt == 1:
         Visualizations()
     elif inpt == 2:
-        FbSearch()
-        OlxSearch()
+        dataframe_list+=FbSearch(dataframe_list)
+        dataframe_list+=OlxSearch(dataframe_list)
     elif inpt == 0:
 
-        FbSearch()
-        OlxSearch()
+        dataframe_list+=FbSearch(dataframe_list)
+        dataframe_list+=OlxSearch(dataframe_list)
         Visualizations
+        sendMsg(dataframe_list)
+    elif inpt == 4:
+        sendMsg(dataframe_list)
     else:
         print("Default")
-        FbSearch()
-        OlxSearch()
-
+        dataframe_list+=FbSearch(dataframe_list)
+        dataframe_list+=OlxSearch(dataframe_list)
+        sendMsg(dataframe_list)
  
 
-def OlxSearch():
+def OlxSearch(dataframe_list):
     iphone11OLX = olxSearcher(
     OLX_URL_PAGE1="https://www.olx.pl/warszawa/q-iphone-11/?search%5Border%5D=created_at:desc",
     OLX_URL_PAGE2="https://www.olx.pl/warszawa/q-iphone-11/?page=2&search%5Border%5D=created_at%3Adesc",
@@ -46,7 +54,8 @@ def OlxSearch():
     
     iphone11_list_OLX = iphone11OLX.getPhonesinfo()   
     df_olx_11 = createTable(iphone11_list_OLX, "iphone_11_list_OLX.csv")
-    
+    dataframe_list.append(df_olx_11)
+
     iphone13OLX = olxSearcher(
         OLX_URL_PAGE1="https://www.olx.pl/warszawa/q-iphone-13/?search%5Border%5D=created_at:desc",
         OLX_URL_PAGE2="https://www.olx.pl/warszawa/q-iphone-13/?page=2&search%5Border%5D=created_at%3Adesc",
@@ -57,7 +66,8 @@ def OlxSearch():
     
     iphone13_list_OLX = iphone13OLX.getPhonesinfo()   
     df_olx_13 = createTable(iphone13_list_OLX, "iphone_13_list_OLX.csv")
-    
+    dataframe_list.append(df_olx_13)
+
     iphone14OLX = olxSearcher(
         OLX_URL_PAGE1="https://www.olx.pl/warszawa/q-iphone-14/?search%5Border%5D=created_at:desc",
         OLX_URL_PAGE2="https://www.olx.pl/warszawa/q-iphone-14/?page=2&search%5Border%5D=created_at%3Adesc",
@@ -68,7 +78,8 @@ def OlxSearch():
     
     iphone14_list_OLX = iphone14OLX.getPhonesinfo()   
     df_olx_14 = createTable(iphone14_list_OLX, "iphone_14_list_OLX.csv")    
-    
+    dataframe_list.append(df_olx_14)
+
     iphone15OLX = olxSearcher(
         OLX_URL_PAGE1="https://www.olx.pl/warszawa/q-iphone-15/?search%5Border%5D=created_at:desc",
         OLX_URL_PAGE2="https://www.olx.pl/warszawa/q-iphone-15/?page=2&search%5Border%5D=created_at%3Adesc",
@@ -79,6 +90,7 @@ def OlxSearch():
     
     iphone15_list_OLX = iphone15OLX.getPhonesinfo()   
     df_olx_15 = createTable(iphone15_list_OLX, "iphone_15_list_OLX.csv")    
+    dataframe_list.append(df_olx_15)
     
     iphone16OLX = olxSearcher(
         OLX_URL_PAGE1="https://www.olx.pl/warszawa/q-iphone-16/?search%5Border%5D=created_at:desc",
@@ -87,46 +99,53 @@ def OlxSearch():
         MINPRICE=200, #this helps filter all accesories
         PHONE_NAME="iphone 16" # this is case insesitive
     )
+    dataframe_list.append(df_olx_16)
     
     iphone16_list_OLX = iphone16OLX.getPhonesinfo()   
     df_olx_16 = createTable(iphone16_list_OLX, "iphone_16_list_OLX.csv")    
 
-def FbSearch():
+    return dataframe_list
+
+def FbSearch(dataframe_list):
     iphone11FB = FacebookSearcher(
     product="iphone 11"
     )
     
     iphone11_list = iphone11FB.getProductsInfo()
     df_fb_11 = createTable(iphone11_list, "iphone_11_list_fb.csv")
-    
+    dataframe_list.append(df_fb_11)
+
     iphone14FB = FacebookSearcher(
         product="iphone 14"
     )
     
+
     iphone14_list = iphone14FB.getProductsInfo()
     df_fb_14 = createTable(iphone14_list, "iphone_14_list_fb.csv")    
-    
+    dataframe_list.append(df_fb_14)
     iphone15FB = FacebookSearcher(
         product="iphone 15"
     )
     
     iphone15_list = iphone15FB.getProductsInfo()
     df_fb_15 = createTable(iphone15_list, "iphone_15_list_fb.csv")
-    
+    dataframe_list.append(df_fb_15)
     iphone16FB = FacebookSearcher(
         product="iphone 16"
     )
     
     iphone16_list = iphone16FB.getProductsInfo()
     df_fb_16 = createTable(iphone16_list, "iphone_16_list_fb.csv")    
-    
+    dataframe_list.append(df_fb_16)
     iphone13FB = FacebookSearcher(
         product="iphone 13"
     )
     
     iphone13_list = iphone13FB.getProductsInfo()
     df_fb_13 = createTable(iphone13_list, "iphone_13_list_fb.csv")
+    dataframe_list.append(df_fb_13)
 
+    return dataframe_list
 def Visualizations():
     # visualizations ------------------------------------
     # Grouped by phone type
