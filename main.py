@@ -33,7 +33,7 @@ def main():
         OlxSearch()
     elif inpt == 0:
 
-        FbSearch()
+        #FbSearch()
         OlxSearch()
         Visualizations(csv_files)
 
