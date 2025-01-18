@@ -96,7 +96,7 @@ def addTable(phone, filename):
 
 
         #create table with scraped info
-    new_df = pd.DataFrame(data)
+    new_df = pd.DataFrame([data])
 
     #add scrap date to all elements in the table
     new_df['scrape_date'] = pd.Timestamp.now().date()
@@ -104,11 +104,6 @@ def addTable(phone, filename):
 
     #merge and remove duplicates 
     merged_df = pd.concat([existing_df, new_df], ignore_index=True)
-    if "fb" in filename:
-       merged_df = merged_df.drop_duplicates(subset='title', keep='first')
-       pass
-    else :
-        merged_df = merged_df.drop_duplicates(subset='id', keep='first')
     
     #reset index
     merged_df=merged_df.reset_index(drop=True)
