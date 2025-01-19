@@ -51,6 +51,7 @@ def evaluate_model(filename):
 
         print(f"Zapisuję do pliku {new_filename}: {phone['title']}")
         addTable(phone, new_filename)
+        df.drop(index=index)
 
     print("Przetwarzanie zakończone.")
 
