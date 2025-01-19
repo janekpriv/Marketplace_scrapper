@@ -13,10 +13,15 @@ def visualizeTableBubles(filename, phone_name):
 
     df = pd.read_csv(path)
 
+    df['price'] = pd.to_numeric(df['price'], errors='coerce')
+    df = df.dropna(subset=['price'])
+
     price = df['price']
     index = price.index
     sizes = (df['price'] / df['price'].max()) * 300  
     colors = df['price']
+
+
 
     plt.figure(figsize=(10, 6))
     scatter = plt.scatter(
@@ -28,14 +33,14 @@ def visualizeTableBubles(filename, phone_name):
     edgecolors="black" # Krawędź bąbelków
     )
 
-    # Oznaczenia osi
+
     
     plt.xlabel('index')
     plt.ylabel('Cena')
     plt.title(f'Cena {phone_name}')
     plt.colorbar(scatter, label='Cena')
     plt.grid(color='white', linestyle='--', linewidth=0.5)
-    plt.gca().set_facecolor('#d3d3d3')  # Tło wykresu
+    plt.gca().set_facecolor('#d3d3d3')
     #plt.show()
     
     folder_name = str(re.match(r"^(.*?)_", phone_name).group(0))  
@@ -61,6 +66,9 @@ def visualizeTableBar(filename, phone_name):
 
     
     price = df['price']
+
+    df['price'] = pd.to_numeric(df['price'], errors='coerce')
+    df = df.dropna(subset=['price'])
 
     norm = plt.Normalize(df['price'].min(), df['price'].max())  # Min = 100, Max = 1000
     colors = cm.plasma(norm(df['price']))
@@ -89,15 +97,15 @@ def visualizeBoxPlot(filename, phone_name):
 
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
-    data = pd.read_csv(path)
+    df = pd.read_csv(path)
 
     
-    data['price'] = pd.to_numeric(data['price'], errors='coerce')
-    data = data.dropna(subset=['price'])
+    df['price'] = pd.to_numeric(df['price'], errors='coerce')
+    df = df.dropna(subset=['price'])
 
 
     plt.figure(figsize=(8, 6))
-    sns.boxplot(x=data['price'], color="orange")
+    sns.boxplot(x=df['price'], color="orange")
 
 
     plt.title(f"Boxplot cen {phone_name}", fontsize=16)
@@ -121,21 +129,19 @@ def visualizeTime(filename,phone_name):
 
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
-    data = pd.read_csv(path)
+    df = pd.read_csv(path)
 
-    # Upewnienie się, że dane są w odpowiednim formacie
-    data['scrape_date'] = pd.to_datetime(data['scrape_date'])  # Konwersja na typ daty
-    data['price'] = pd.to_numeric(data['price'], errors='coerce')  # Konwersja cen na liczby
-    data = data.dropna(subset=['price'])  # Usunięcie wierszy bez ceny
+    
+    df['scrape_date'] = pd.to_datetime(df['scrape_date'])  
+    df['price'] = pd.to_numeric(df['price'], errors='coerce')  
+    df = df.dropna(subset=['price'])
 
-    # Obliczanie średniej ceny w zależności od daty
-    avg_price_by_date = data.groupby('scrape_date')['price'].mean().reset_index()
 
-    # Tworzenie wykresu
+    avg_price_by_date = df.groupby('scrape_date')['price'].mean().reset_index()
+
     plt.figure(figsize=(10, 6))
     sns.lineplot(data=avg_price_by_date, x='scrape_date', y='price', marker='o', color='blue')
 
-    # Dodanie tytułu i etykiet
     plt.title(f"Średnia cena {phone_name} w zależności od daty", fontsize=16)
     plt.xlabel("Data zbierania danych", fontsize=12)
     plt.ylabel("Średnia cena (zł)", fontsize=12)
@@ -146,11 +152,15 @@ def visualizeTime(filename,phone_name):
     ) 
     plt.grid(True)
 
-    # Wyświetlenie wykresu
+
     plt.tight_layout()
-    #plt.show()
+
 
     folder_name = str(re.match(r"^(.*?)_", phone_name).group(0))  
+
+    # match = re.search(r"(fb|OLX)(\d+GB)?(_PRO)?", filename)
+    # print(match)
+    # model_folder= match.group(0)
     figName =f"{phone_name}_over_time_figure.png"
     savepath = os.path.join("visualizations",folder_name,figName)
 
@@ -165,15 +175,15 @@ def visualizeHistPlot(filename, phone_name):
 
     os.makedirs(os.path.dirname(path), exist_ok=True)
     
-    data = pd.read_csv(path)
+    df = pd.read_csv(path)
 
 
-    data['price'] = pd.to_numeric(data['price'], errors='coerce')  
-    data = data.dropna(subset=['price']) 
+    df['price'] = pd.to_numeric(df['price'], errors='coerce')  
+    df = df.dropna(subset=['price']) 
 
 
     plt.figure(figsize=(10, 6))
-    sns.histplot(data['price'], bins=20, kde=True, color='blue')
+    sns.histplot(df['price'], bins=20, kde=True, color='blue')
 
 
     plt.title(f"Rozkład cen {phone_name}", fontsize=16)
@@ -184,7 +194,8 @@ def visualizeHistPlot(filename, phone_name):
     plt.tight_layout()
 
     #plt.show()
-    folder_name = str(re.match(r"^(.*?)_", phone_name).group(0))    
+    folder_name = str(re.match(r"^(.*?)_", phone_name).group(0))   
+
     figName =f"{phone_name}_Hist_Plot_figure.png"
     savepath = os.path.join("visualizations",folder_name,figName)
 
