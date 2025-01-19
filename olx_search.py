@@ -73,8 +73,10 @@ class olxSearcher:
         soup = BeautifulSoup(response.text, 'html.parser')
         prices = soup.find_all(string=re.compile(r"zł$"))
 
-        for item in prices:
 
+        for item in prices:
+            if item.parent.parent.find('a') == None:
+                continue
             link = f"https://www.olx.pl/{item.parent.parent.find('a').get('href')}/"
             title = item.parent.parent.find("h4").string
             price_element =item.parent.parent.parent.find_all("p")[0]
@@ -106,8 +108,7 @@ class olxSearcher:
                         "id" : id # for database purpouses
                     }
                     self.phonelist.append(phone)
-                    print(phone)
-     
+
 
         return self.phonelist
     
