@@ -7,10 +7,10 @@ def createTable(phones_list, filename):
     path = os.path.join("phones_csv", filename)
 
     if os.path.exists(path):
-        #load existing csv file
         existing_df = pd.read_csv(path)
+        print(existing_df)
+        exit
     else:
-        #create empty table
         if "fb" in filename:
             existing_df = pd.DataFrame(
                 columns=["title","price","link"]
@@ -35,14 +35,12 @@ def createTable(phones_list, filename):
             "link" : [phone['link'] for phone in phones_list],
             "time_location" : [phone['time_location'] for phone in phones_list ] 
         }
-    #create table with scraped info
+
     new_df = pd.DataFrame(data)
 
-    #add scrap date to all elements in the table
     new_df['scrape_date'] = pd.Timestamp.now().date()
 
 
-    #merge and remove duplicates 
     merged_df = pd.concat([existing_df, new_df], ignore_index=True)
     if "fb" in filename:
        merged_df = merged_df.drop_duplicates(subset='title', keep='first')
@@ -50,68 +48,66 @@ def createTable(phones_list, filename):
     else :
         merged_df = merged_df.drop_duplicates(subset='id', keep='first')
     
-    #reset index
+
     merged_df=merged_df.reset_index(drop=True)
 
-    #remove NAN price values -> problems with plotting later
     merged_df['price'] = pd.to_numeric(merged_df['price'], errors='coerce')
     merged_df = merged_df.dropna(subset=['price'])
-
-    #save to file 
+ 
     merged_df.to_csv(path, index=False)
     return merged_df
 
+
 def addTable(phone, filename):
+
 
     path = os.path.join("phones_csv", filename)
 
-    if os.path.exists(path):
-        #load existing csv file
-        existing_df = pd.read_csv(path)
+    if os.path.exists(path) and os.path.getsize(path) > 0: 
+        try:
+            existing_df = pd.read_csv(path)
+        except Exception as e:
+            print(f"Błąd podczas odczytu pliku {filename}: {e}")
+            existing_df = pd.DataFrame()
     else:
-        #create empty table
+
         if "fb" in filename:
-            existing_df = pd.DataFrame(
-                columns=["title","price","link"]
-            )
+            existing_df = pd.DataFrame(columns=["title", "price", "link", "scrape_date"])
         else:
-            existing_df = pd.DataFrame(
-                columns=["title","price","id","link","time_location"]
-            )
+            existing_df = pd.DataFrame(columns=["title", "price", "id", "link", "time_location", "scrape_date"])
 
     if "fb" in filename:
-        data ={
-            "title" : phone['title'],
-            "price" : phone['price'],
-            "link" : phone['link']
+        data = {
+            "title": phone['title'],
+            "price": phone['price'],
+            "link": phone['link'],
+            "scrape_date" : phone['scrape_date']
         }
     else:
         data = {
-            "title" : phone['title'],
-            "price" : phone['price'],
-            "id" : phone['id'],
-            "link" : phone['link'],
-            "time_location" : phone['time_location'] 
+            "title": phone['title'],
+            "price": phone['price'],
+            "id": phone['id'],
+            "link": phone['link'],
+            "scrape_date" : phone['scrape_date'],
+            "time_location": phone['time_location']
         }
 
 
-        #create table with scraped info
     new_df = pd.DataFrame([data])
 
-    #add scrap date to all elements in the table
-    new_df['scrape_date'] = pd.Timestamp.now().date()
 
-
-    #merge and remove duplicates 
     merged_df = pd.concat([existing_df, new_df], ignore_index=True)
-    
-    #reset index
-    merged_df=merged_df.reset_index(drop=True)
 
-    #remove NAN price values -> problems with plotting later
+    merged_df = merged_df.drop_duplicates()
+
     merged_df['price'] = pd.to_numeric(merged_df['price'], errors='coerce')
     merged_df = merged_df.dropna(subset=['price'])
 
-    #save to file 
-    merged_df.to_csv(path, index=False)
+
+    try:
+        merged_df.to_csv(path, index=False)
+    except Exception as e:
+        print(f"Błąd podczas zapisywania do pliku {filename}: {e}")
+
     return merged_df
