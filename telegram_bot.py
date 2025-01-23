@@ -9,9 +9,13 @@ from info import *
 from evaluate_model import *
 from sumarized import *
 from visuailzations import *
+from table import *
 
 TELEGRAM_BOT_TOKEN = "7828773314:AAEkF_vIyhLdHLa8196QgnvVAUWhR6Bv5Dc"
 CHAT_IDS_FILE = "chat_ids.txt"
+PROFIT = 0.7
+
+
 
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -43,7 +47,20 @@ async def check_and_send_updates(application):
                 #check price
                 if phone['price'] == None:
                     continue
-                if phone['title'] not in notifications_sent and float(phone['price']) - 200 < mean_price:
+                model_number, is_pro, memory = extract_model_info(file)
+
+                if memory is None:
+                    if 'GB' in phone['title']:
+                        continue 
+
+                if memory and memory in phone['title']:
+                    if is_pro and 'PRO' not in ['title']:
+                        continue
+
+                if phone['title'] not in notifications_sent and float(phone['price'])  < mean_price*PROFIT:
+                    
+                    print("cena")
+                    print(phone['price'])
 
                     notifications_sent.append(phone['title'])
 
@@ -64,7 +81,8 @@ async def check_and_send_updates(application):
 
                             except Exception as e:
                                 print(f"Nie udało się wysłać wiadomości do chat_id {chat_id}: {e}")
-        await asyncio.sleep(60)
+        createTable(list, file)
+        await asyncio.sleep(600)
 
 # Funkcja startowa z przyciskami
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -77,6 +95,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Czy chcesz zapisać się na powiadomienia o nowych danych? 📩",
         reply_markup=reply_markup
     )
+
+async def test(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Bot działa poprawnie! ✅")
 
 # Funkcja obsługująca przyciski
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -100,7 +121,8 @@ async def main():
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button_handler))
-
+    application.add_handler(CommandHandler("test", test))
+    
     # Uruchamianie funkcji cyklicznej w tle
     asyncio.create_task(check_and_send_updates(application))
 
