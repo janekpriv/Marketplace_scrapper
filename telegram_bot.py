@@ -5,10 +5,10 @@ import threading
 import time
 import os
 import sys
-from olx_search import olxSearcher
-from facebook import FacebookSearcher
+from info import *
 from evaluate_model import *
 from sumarized import *
+from visuailzations import *
 
 TELEGRAM_BOT_TOKEN = "7828773314:AAEkF_vIyhLdHLa8196QgnvVAUWhR6Bv5Dc"
 CHAT_IDS_FILE = "chat_ids.txt"
@@ -16,24 +16,54 @@ CHAT_IDS_FILE = "chat_ids.txt"
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
+notifications_sent = []
+
 
 # Funkcja do cyklicznego sprawdzania i wysyłania aktualizacji
 async def check_and_send_updates(application):
     while True:
         print("Sprawdzanie nowych danych...")
         csv_files = os.listdir('phones_csv')
-        if "iphone16_list_OLX.csv" in csv_files:
-            file_path = os.path.join('phones_csv', "iphone16_list_OLX.csv")
-            with open(file_path, 'rb') as file:
-                if os.path.exists(CHAT_IDS_FILE):
-                    with open(CHAT_IDS_FILE, "r") as chat_file:
-                        chat_ids = [line.split(",")[0].strip() for line in chat_file.readlines()]
-                    for chat_id in chat_ids:
-                        try:
-                            await application.bot.send_message(chat_id=int(chat_id), text="Znaleziono nowe dane dla iPhone 16!")
-                            await application.bot.send_document(chat_id=int(chat_id), document=file)
-                        except Exception as e:
-                            print(f"Nie udało się wysłać wiadomości do chat_id {chat_id}: {e}")
+        stats_df = pd.read_csv(os.path.join('stats', 'stats.csv'))
+        for file in csv_files:
+
+            if file not in stats_df['filename'].values:
+                continue
+
+            if "fb" in file:
+                continue
+
+            mean_price = stats_df.loc[stats_df['filename'] == file, 'mean'].values[0]
+            print(mean_price)
+
+            list = OlxSearchTMP(file)
+
+            for phone in list:
+
+                #check price
+                if phone['price'] == None:
+                    continue
+                if phone['title'] not in notifications_sent and float(phone['price']) - 200 < mean_price:
+
+                    notifications_sent.append(phone['title'])
+
+                    #phone_name = re.match(r"^(.*?)_list_(OLX|fb)", file).group(0)
+                    phone_name = file.replace(".csv","")
+                
+                    if os.path.exists(CHAT_IDS_FILE):
+            
+                        with open(CHAT_IDS_FILE, "r") as chat_file:
+            
+                            chat_ids = [line.split(",")[0].strip() for line in chat_file.readlines()]
+            
+                        for chat_id in chat_ids:
+            
+                            try:
+            
+                                await application.bot.send_message(chat_id=int(chat_id), text=f"okazja {phone_name} za {phone['price']} \n link: {phone['link']}")
+
+                            except Exception as e:
+                                print(f"Nie udało się wysłać wiadomości do chat_id {chat_id}: {e}")
         await asyncio.sleep(60)
 
 # Funkcja startowa z przyciskami
