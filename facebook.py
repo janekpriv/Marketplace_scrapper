@@ -27,7 +27,7 @@ class FacebookSearcher:
         chromedriver_path = os.path.join(folder, "chromedriver.exe")
         chrome_options = Options()
         #chrome_options.add_argument("--force-device-scale-factor=0.25")
-
+        chrome_options.add_argument("--headless")
         self.browser = webdriver.Chrome(
             service=Service(chromedriver_path),
             options=chrome_options
@@ -90,6 +90,15 @@ class FacebookSearcher:
         return html
     def getProductsInfo(self):
 
+        BannedKeywords = [
+            "opakowanie",
+            "wymiana",
+            "plecki",
+            "korpus",
+            "naprawa",
+            "pokrowiec"
+        ]
+
         html = self.getHTML()
         product_info = []
 
@@ -112,7 +121,7 @@ class FacebookSearcher:
                 if img_tag:
                     item_name = img_tag["alt"]
 
-                if self.product.lower() not in item_name.lower():
+                if self.product.lower() not in item_name.lower() or item_name.lower() in BannedKeywords:
                     continue
 
                 product ={
