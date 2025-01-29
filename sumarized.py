@@ -44,7 +44,10 @@ def sumarize_data():
 
         merged_df = pd.concat([existing_df, new_df], ignore_index=True)
 
-        merged_df = merged_df.drop_duplicates()
+        merged_df = merged_df.drop_duplicates(
+            subset= ['filename'],
+            keep = 'last').reset_index(drop = True)
+        
 
         try:
             merged_df.to_csv(path, index=False)
